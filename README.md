@@ -1,1 +1,1 @@
-# Tesi Magistrale di manipolazione dual arm
+# Tesi Magistrale manipolazione dual arm
