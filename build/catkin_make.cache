@@ -1,0 +1,2 @@
+controllo_franka/panda_controllers:dual_arm/dual_arm_bringup:dual_arm/dual_arm_control:dual_arm/dual_arm_description:dual_arm/dual_arm_gazebo:dual_arm/dual_arm_viz:franka_ros/franka_control:franka_ros/franka_description:franka_ros/franka_example_controllers:franka_ros/franka_gazebo:franka_ros/franka_gripper:franka_ros/franka_hw:franka_ros/franka_msgs:franka_ros/franka_ros:franka_ros/franka_visualization:gc_calibration
+-DCATKIN_DEVEL_PREFIX=/home/franka/test_dual_arm/devel -DCMAKE_INSTALL_PREFIX=/home/franka/test_dual_arm/install -G Unix Makefiles

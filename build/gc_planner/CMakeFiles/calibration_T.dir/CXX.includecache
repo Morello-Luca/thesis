@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/franka/test_dual_arm/src/gc_planner/src/calibration_T.cpp
+/home/franka/test_dual_arm/src/gc_calibration/include/gc_planner_header.h
+-
+

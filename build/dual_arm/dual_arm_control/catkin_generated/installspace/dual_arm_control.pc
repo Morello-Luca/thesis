@@ -1,0 +1,8 @@
+prefix=/home/franka/test_dual_arm/install
+
+Name: dual_arm_control
+Description: Description of dual_arm_control
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
