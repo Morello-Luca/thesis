@@ -5,6 +5,7 @@
 # it emulates the modifications of the setup script without recurring computations
 
 # new environment variables
+export ROS_MASTER_URI='http://localhost:11311'
 
 # modified environment variables
 export PWD='/home/franka/test_dual_arm/build'

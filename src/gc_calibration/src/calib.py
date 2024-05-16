@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-import scipy
+import scipy 
 
 def shah(AA, BB):
     m, n = AA.shape
@@ -44,7 +44,7 @@ def shah(AA, BB):
     Y = Y.T
     Y = np.sign(np.linalg.det(Y))/pow(abs(np.linalg.det(Y)),1/3)*Y
 
-    u, s, v = scipy.linalg.svd(Y)
+    u, s, v = np.linalg.svd(Y)
     s = np.diag(s)
     sign_u = np.linalg.det(u)
     if sign_u < 0:
@@ -72,7 +72,7 @@ def shah(AA, BB):
     return X, Y
 
 # Caricamento del file CSV
-file_in = '/home/marco/ros_ws/src/gc_calibration/workdir/calib_matrices.csv'
+file_in = '/home/franka/test_dual_arm/src/gc_calibration/workdir/calib_matrices.csv'
 matrices = pd.read_csv(file_in, delim_whitespace=True, header=None)
 matrices = np.array(matrices)
 
@@ -101,6 +101,6 @@ print(Y)
 #X = np.round(X,decimals = 4) scommentare per avere una matrice con 4 cifre significative
 
 
-file_out = '/home/marco/ros_ws/src/gc_planner/workdir/camera_calib_debug_1.csv'
+file_out = '/home/franka/test_dual_arm/src/gc_calibration/camera_calib_debug_dual.csv'
 np.savetxt(file_out, X, delimiter=' ')
 
