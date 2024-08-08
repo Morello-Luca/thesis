@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Args -->
+    <arg name="robot_model_name" default="combined_panda_arm" />
+    <arg name="arm_id_1" default="panda_1" />
+    <arg name="arm_id_2" default="panda_2" />
+    <arg name="use_gripper" default="false" />
+    <arg name="world" default="worlds/empty.world" doc="Filename to a SDF World for gazebo to use" />
+    <arg name="gazebo" default="true" />
+    <arg name="paused" default="true" />
+    <arg name="rviz" default="true" />
+    <arg name="controller" default=" "
+        doc="Which example controller should be started? (One of {cartesian_impedance,model,force,joint_position,joint_velocity}_example_controller)" />
+    <arg name="offset_x" default="0.0" doc="How far forward to place the base of the robot in [m]?" />
+    <arg name="offset_y" default="0.5"
+        doc="How far leftwards to place the base of the robot in [m]?" />
+    <arg name="offset_z" default="1.0" doc="How far upwards to place the base of the robot in [m]?" />
+
+    <!-- Launch empty Gazebo world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg gazebo)">
+        <arg name="use_sim_time" value="true" />
+        <arg name="gui" value="true" />
+        <arg name="paused" value="true" />
+        <arg name="debug" value="false" />
+        <arg name="headless" value="false" />
+    </include>
+
+    <!-- Find my robot Description-->
+    <param name="robot_description"
+        command="xacro $(find dual_arm_description)/robot/panda_multiple_arms.urdf.xacro
+              gazebo:=$(arg gazebo)
+              hand:=$(arg use_gripper)
+              arm_id_1:=$(arg arm_id_1)
+              arm_id_2:=$(arg arm_id_2)
+              xyz:='$(arg offset_x) $(arg offset_y) $(arg offset_z)'">
+    </param>
+
+    <!-- Spawn The robot over the robot_description param-->
+    <node name="$(arg robot_model_name)_model_spawner"
+        pkg="gazebo_ros"
+        type="spawn_model"
+        args="-param robot_description -urdf -model $(arg robot_model_name) 
+             " />
+
+    <!-- Load ROS Controllers params from YAML-->
+    <rosparam file="$(find dual_arm_control)/config/joint_state_controller.yaml" subst_value="true"
+        command="load" />
+    <!-- <arg name="hw_config_file" default="$(find franka_control)/config/franka_combined_control_node.yaml" command="load" /> -->
+
+
+
+    <!-- spawns the controller after the robot was put into its initial joint pose -->
+    <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner"
+        args="joint_state_controller" respawn="false" output="screen" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+    <!-- Joint trajectory controller -->
+    <rosparam file="$(find dual_arm_control)/config/trajectory_controller.yaml" subst_value="true"
+        command="load" />
+
+    <node name="arms_force_control" pkg="controller_manager" type="spawner"
+        respawn="false" output="screen"
+        args="force_panda1 force_panda2" />
+
+
+    <node pkg="rviz" type="rviz" output="screen" name="rviz"
+        args="-d $(find dual_arm_viz)/rviz/model.rviz" if="$(arg rviz)" />
+
+</launch>

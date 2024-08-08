@@ -1,0 +1,39 @@
+position_joint_trajectory_controller1:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - panda_1_joint1
+    - panda_1_joint2
+    - panda_1_joint3
+    - panda_1_joint4
+    - panda_1_joint5
+    - panda_1_joint6
+    - panda_1_joint7
+  constraints:
+    goal_time: 0.5
+    panda_1_joint1: { goal: 0.05}
+    panda_1_joint2: { goal: 0.05}
+    panda_1_joint3: { goal: 0.05}
+    panda_1_joint4: { goal: 0.05}
+    panda_1_joint5: { goal: 0.05}
+    panda_1_joint6: { goal: 0.05}
+    panda_1_joint7: { goal: 0.05}
+
+position_joint_trajectory_controller2:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - panda_2_joint1
+    - panda_2_joint2
+    - panda_2_joint3
+    - panda_2_joint4
+    - panda_2_joint5
+    - panda_2_joint6
+    - panda_2_joint7
+  constraints:
+    goal_time: 0.5
+    panda_2_joint1: { goal: 0.05}
+    panda_2_joint2: { goal: 0.05}
+    panda_2_joint3: { goal: 0.05}
+    panda_2_joint4: { goal: 0.05}
+    panda_2_joint5: { goal: 0.05}
+    panda_2_joint6: { goal: 0.05}
+    panda_2_joint7: { goal: 0.05}

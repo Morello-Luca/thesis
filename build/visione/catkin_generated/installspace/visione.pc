@@ -1,0 +1,8 @@
+prefix=/home/franka/test_dual_arm/install
+
+Name: visione
+Description: Description of visione
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

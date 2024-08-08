@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="robot_model_name" default="combined_panda_arm" />
+    <arg name="arm_id_1" default="right_arm" />
+    <arg name="arm_id_2" default="left_arm" />
+    <arg name="use_gripper" default="false" />
+    <arg name="gazebo" default="true" />
+    <arg name="offset_x" default="0.0" doc="How far forward to place the base of the robot in [m]?" />
+    <arg name="offset_y" default="0.5"
+        doc="How far leftwards to place the base of the robot in [m]?" />
+    <arg name="offset_z" default="1.0" doc="How far upwards to place the base of the robot in [m]?" />
+
+    <param name="robot_description"
+        command="xacro $(find dual_arm_description)/robot/panda_multiple_arms.urdf.xacro
+                  gazebo:=$(arg gazebo)
+                  hand:=$(arg use_gripper)
+                  arm_id_1:=$(arg arm_id_1)
+                  arm_id_2:=$(arg arm_id_2)
+                  xyz:='$(arg offset_x) $(arg offset_y) $(arg offset_z)'">
+    </param>
+
+</launch>

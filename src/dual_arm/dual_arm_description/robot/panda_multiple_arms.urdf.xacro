@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<robot name="panda_multiple_arms" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <!-- add arms names prefixes -->
+    <xacro:arg name="arm_id_1" default="right_arm" />
+    <xacro:arg name="arm_id_2" default="left_arm" />
+    <xacro:arg name="gazebo" default="false" />
+    <xacro:arg name="hand" default="false" />
+    <xacro:arg name="offset_x" default="0.0" />
+    <xacro:arg name="offset_y" default="0.5" />
+    <xacro:arg name="offset_z" default="1.0" />
+
+    <!-- load arm/hand models and utils (which adds the robot inertia tags to be Gazebo-simulation
+    ready) -->
+    <xacro:include filename="$(find franka_description)/robots/common/utils.xacro" />
+    <xacro:include filename="$(find franka_description)/robots/common/franka_arm.xacro" />
+    <xacro:include filename="$(find franka_description)/robots/common/franka_hand.xacro" />
+    <xacro:include filename="$(find dual_arm_description)/robot/gazebo_transmission.xacro" />
+
+    <link name="world" />
+
+    <!-- box shaped table as base for the 2 Pandas -->
+    <link name="base">
+        <visual>
+            <origin xyz="0 0 0.5" rpy="0 0 0" />
+            <geometry>
+                <box size="1 2 1" />
+            </geometry>
+            <material name="White">
+                <color rgba="0.8 0.0 0.0 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.5" rpy="0 0 0" />
+            <geometry>
+                <box size="1 2 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <mass value="10.0" />
+            <inertia ixx="0.001" ixy="0.0" ixz="0.001" iyy="0.0" iyz="0.0" izz="0.001" />
+        </inertial>
+    </link>
+
+    <joint name="base_to_world" type="fixed">
+        <parent link="world" />
+        <child link="base" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <!-- right arm  -->
+    <xacro:franka_arm arm_id="$(arg arm_id_1)" connected_to="base"
+        xyz="$(arg offset_x) -$(arg offset_y) $(arg offset_z)"
+        gazebo="$(arg gazebo)"
+        safety_distance="0.03"
+        joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}" />
+
+    <!-- left arm  -->
+    <xacro:franka_arm arm_id="$(arg arm_id_2)" connected_to="base"
+        xyz="$(arg offset_x) $(arg offset_y) $(arg offset_z)"
+        gazebo="$(arg gazebo)"
+        safety_distance="0.03"
+        joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}" />
+
+    <!-- Enable gripper -->
+    <xacro:if value="$(arg hand)">
+        <xacro:franka_hand arm_id="$(arg arm_id_2)" rpy="0 0 ${-pi/4}"
+            connected_to="$(arg arm_id_2)_link8" gazebo="$(arg gazebo)" safety_distance="0.03" />
+        <xacro:franka_hand arm_id="$(arg arm_id_1)" rpy="0 0 ${-pi/4}"
+            connected_to="$(arg arm_id_1)_link8" gazebo="$(arg gazebo)" safety_distance="0.03" />
+    </xacro:if>
+
+    <xacro:if value="$(arg gazebo)">
+        <gazebo reference="base">
+            <material>Gazebo/Red</material>
+        </gazebo>
+        <xacro:franka_transmission arm_id="$(arg arm_id_1)" hand="$(arg hand)" />
+        <xacro:franka_transmission arm_id="$(arg arm_id_2)" hand="$(arg hand)" />
+    </xacro:if>
+
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so" />
+    </gazebo>
+</robot>
