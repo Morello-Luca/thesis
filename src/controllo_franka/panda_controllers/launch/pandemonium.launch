@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<launch>
+
+
+<include file="$(find gazebo_ros)/launch/empty_world.launch" >
+ <!--   Start paused, simulation will be started, when Pandas were loaded -->
+    <arg name="paused" value="true"/>
+    <arg name="verbose" value="true" />
+    <arg name="use_sim_time" value="true"/>
+</include> 
+
+<!--_____________________________________FRANKA 1________________________________________________________________-->
+  <group ns="panda_1">
+  <rosparam command="load" file="$(find panda_controllers)/config/panda_controllers_default_copy.yaml" />
+    <include file="$(find franka_gazebo)/launch/panda.launch">
+      <!-- ID -->
+      	<arg name="arm_id"     value="panda_1" />
+      <!-- CONFIGURAZIONE -->
+      	<arg name="x"           default="-0.4"     doc="How far forward to place the base of the robot in [m]?" />
+  	<arg name="y"           default="-1"     doc="How far leftwards to place the base of the robot in [m]?" />
+  	<arg name="z"           default="0"     doc="How far upwards to place the base of the robot in [m]?" />
+  	<arg name="roll"        default="0"     doc="How much to rotate the base of the robot around its X-axis in [rad]" />
+  	<arg name="pitch"       default="0"     doc="How much to rotate the base of the robot around its Y-axis in [rad]" />
+  	<arg name="yaw"         default="0"     doc="How much to rotate the base of the robot around its Z-axis in [rad]" />
+      <!-- CONTROLLO -->  
+      	<arg name="controller" value="panda1" />
+      <!-- PARAMETRI -->  
+      	<arg name="rviz"       value="false" />
+      	<arg name="gazebo"     value="false" />
+      	<arg name="paused"     value="true" />
+    </include>
+  </group>
+
+<!--_____________________________________FRANKA 2________________________________________________________________-->  
+    <group ns="panda_2">
+  <rosparam command="load" file="$(find panda_controllers)/config/panda_controllers_default_copy.yaml" />
+    <include file="$(find franka_gazebo)/launch/panda.launch">
+      <!-- ID -->
+      	<arg name="arm_id"     value="panda_2" />
+      <!-- CONFIGURAZIONE -->
+      	<arg name="x"           default="-0.4"     doc="How far forward to place the base of the robot in [m]?" />
+  	<arg name="y"           default="1"     doc="How far leftwards to place the base of the robot in [m]?" />
+  	<arg name="z"           default="0"     doc="How far upwards to place the base of the robot in [m]?" />
+  	<arg name="roll"        default="0"     doc="How much to rotate the base of the robot around its X-axis in [rad]?" />
+  	<arg name="pitch"       default="0"     doc="How much to rotate the base of the robot around its Y-axis in [rad]?" />
+  	<arg name="yaw"         default="0"     doc="How much to rotate the base of the robot around its Z-axis in [rad]?" />
+      <!-- CONTROLLO -->  
+        <arg name="controller" value="panda2" />
+      <!-- PARAMETRI -->  
+      	<arg name="rviz"       value="false" />
+      	<arg name="gazebo"     value="false" />
+      	<arg name="paused"     value="false" />
+    </include>
+  </group>
+</launch>

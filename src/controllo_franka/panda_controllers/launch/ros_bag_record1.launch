@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="rosbag" name="record" type="record" args="-O /home/franka/23-05-24_pickup_10_yneg.bag
+   /combined_panda/panda_1_state_controller/franka_states 
+   /combined_panda/panda_2_state_controller/franka_states
+
+/both_force
+   
+/combined_panda/cartesian_impedance_example_controller1/franka_ee_pose
+/combined_panda/cartesian_impedance_example_controller2/franka_ee_pose
+
+/combined_panda/cartesian_impedance_example_controller1/equilibrium_pose
+/combined_panda/cartesian_impedance_example_controller2/equilibrium_pose
+
+/combined_panda/cartesian_impedance_example_controller1/residuo
+/combined_panda/cartesian_impedance_example_controller2/residuo
+
+/combined_panda/cartesian_impedance_example_controller1/stima_forza
+/combined_panda/cartesian_impedance_example_controller2/stima_forza
+
+/combined_panda/cartesian_impedance_example_controller1/errore_stima
+/combined_panda/cartesian_impedance_example_controller2/errore_stima
+
+/combined_panda/cartesian_impedance_example_controller1/force_control_errors
+/combined_panda/cartesian_impedance_example_controller2/force_control_errors
+
+/combined_panda/cartesian_impedance_example_controller2/obj_len
+
+
+" />
+</launch>
+

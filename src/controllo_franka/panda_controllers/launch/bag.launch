@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="record"   pkg="rosbag" type="record" output="screen" 
+	args= "record -a -o ~/Desktop/output.bag"  />
+
+</launch>

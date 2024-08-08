@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="rosbag" name="record" type="record" args="-O /home/franka/test_dual_arm_april_11_test_new_cartesian.bag
+   /combined_panda/panda_1_state_controller/franka_states 
+   /combined_panda/panda_2_state_controller/franka_states
+   /both_force
+   /combined_panda/force_panda1/stima_forza
+   /combined_panda/force_panda2/stima_forza
+   /combined_panda/force_panda1/errore_stima
+   /combined_panda/force_panda2/errore_stima 
+   /combined_panda/force_panda1/residuo
+   /combined_panda/force_panda2/residuo 
+   /combined_panda/force_panda1/force_control_errors 
+   /combined_panda/force_panda2/force_control_errors
+   /combined_panda/force_panda1/franka_ee_pose
+   /combined_panda/force_panda2/franka_ee_pose
+   /combined_panda/force_panda1/equilibrium_pose
+   /combined_panda/force_panda2/equilibrium_pose
+" />
+</launch>
+
