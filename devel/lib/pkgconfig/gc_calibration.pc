@@ -1,8 +1,0 @@
-prefix=/home/franka/test_dual_arm/devel
-
-Name: gc_calibration
-Description: Description of gc_calibration
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib -lgc_calibration
-Requires: geometry_msgs roscpp rospy std_msgs message_runtime
