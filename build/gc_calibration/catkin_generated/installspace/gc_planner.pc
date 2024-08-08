@@ -1,8 +1,0 @@
-prefix=/home/franka/test_dual_arm/install
-
-Name: gc_planner
-Description: Description of gc_planner
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib -lgc_planner
-Requires: geometry_msgs roscpp rospy std_msgs message_runtime
