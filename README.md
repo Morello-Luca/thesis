@@ -31,7 +31,7 @@ This conflict between force and motion directions can present challenges in achi
 ![image](https://github.com/user-attachments/assets/f33e2382-6580-4fe5-9cac-47dac9b9ab31)
 ## Desired Trajectory in Task Frame
 
-The term ** $$^{𝑇𝐹𝑥}_𝑑 $$** represents the desired trajectory of the object defined in a **task frame**.
+The term $$^{𝑇𝐹𝑥}_𝑑 $$ represents the desired trajectory of the object defined in a **task frame**.
 
 ### Objective
 
