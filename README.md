@@ -31,7 +31,7 @@ This conflict between force and motion directions can present challenges in achi
 ![image](https://github.com/user-attachments/assets/f33e2382-6580-4fe5-9cac-47dac9b9ab31)
 ## Desired Trajectory in Task Frame
 
-The term $$^{𝑇𝐹𝑥}_𝑑 $$ represents the desired trajectory of the object defined in a **task frame**.
+The term $$^{𝑇𝐹}x_𝑑 $$ represents the desired trajectory of the object defined in a **task frame**.
 
 ### Objective
 
@@ -39,5 +39,15 @@ The objective is to establish a **shared point of reference** that allows multip
 
 - **Controlling the pose of the object** rather than the individual movements of each manipulator.
 - Ensuring that the object follows the desired trajectory **within the task frame** while maintaining coordination among the manipulators.
+
+![image](https://github.com/user-attachments/assets/b34a47f4-c5a3-4004-b701-30d0231b9daf)
+![image](https://github.com/user-attachments/assets/cec7eb4f-a1b2-4d3e-928e-071433e42143)
+
+In order to address the aforementioned possible conflict, we first define and adapt the stiffness matrix in the end-effector frame 
+Proposed stiffness adaptation policy 
+![image](https://github.com/user-attachments/assets/65ec854b-3457-4ec4-ab67-ad88b7360ff6)
+
+
+
 
 
