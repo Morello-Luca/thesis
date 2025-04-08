@@ -32,11 +32,11 @@ An RGB-D camera captures the workspace's point cloud, enabling the vision node t
 
 I have been working with a framework consisting of two seven-jointed manipulators that are firmly grasping a common rigid object. In order to ensure a stable grasp, each manipulator must apply a normal force $${}^{ee}f_d$$ at their respective contact points. 
 
-This algorithm, designed for an $$n$$-DoF manipulator, assumes that $$ {}^{ee}R $$ rotates its frame with respect to the task frame. The other cooperative arms will use the same algorithm, each with their associated frame rotation matrix (see Fig. `franka_box_1`).
+This algorithm, designed for an $$n$$-DoF manipulator, assumes that $${}^{ee}R$$ rotates its frame with respect to the task frame. The other cooperative arms will use the same algorithm, each with their associated frame rotation matrix (see Fig. `franka_box_1`).
 
-Assuming a stable grasp between the end-effector and the object, we define the end-effector's vector $$ {}^{ee}p_{cr} $$ within its frame, linking it to the object's rotation center. This common point among all manipulators is critical, as it provides a uniform reference for all robots. This is necessary in our dual-arm framework to preserve modularity by controlling the object's center of rotation instead of individual manipulator control.
+Assuming a stable grasp between the end-effector and the object, we define the end-effector's vector $${}^{ee}p_{cr}$$ within its frame, linking it to the object's rotation center. This common point among all manipulators is critical, as it provides a uniform reference for all robots. This is necessary in our dual-arm framework to preserve modularity by controlling the object's center of rotation instead of individual manipulator control.
 
-To relate velocities, I define the Jacobian matrix $$ J_{cr} \in \mathbb{R}^{6 \times 6} $$, where $$ x $$ and $$ x_{ee} $$ represent the Cartesian poses of the object's rotation center and the manipulator's end-effector, respectively.
+To relate velocities, I define the Jacobian matrix $$J_{cr} \in \mathbb{R}^{6 \times 6}$$, where $$x$$ and $$x_{ee}$$ represent the Cartesian poses of the object's rotation center and the manipulator's end-effector, respectively.
 
 As a result, the manipulator joint velocities can be mapped into Cartesian space at the object's center of rotation through the following equation:
 
@@ -50,4 +50,6 @@ $$
 M_C(q) \ddot{x} + C_C(q \dot{q}) \dot{x} + f_g(q) = f_{in} + J_{cr}^{-T} f_{ext}
 $$
 
-where $$ f_{ext} \in \mathbb{R}^6 $$ is the external wrench acting on the robot.
+where $$f_{ext \in \mathbb{R}^6$$ is the external wrench acting on the robot.
+![franka_box_1](https://github.com/user-attachments/assets/6dcae09b-d5ec-41df-a834-b84a92aff8b7)
+
