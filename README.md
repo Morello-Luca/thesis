@@ -1,124 +1,25 @@
-### Human-like motion planning and sensorless control framework for bimanual grasping of cumbersome objects
+![Slide1](https://github.com/user-attachments/assets/2fa8b641-a228-48e4-bee7-7fcb025e3b46)
+![Slide2](https://github.com/user-attachments/assets/4ecdf3f1-c9bf-4037-acd4-b4074a7cc521)
+![Slide3](https://github.com/user-attachments/assets/450f2d85-e0e5-4151-9141-19665a46a0c0)
+![Slide4](https://github.com/user-attachments/assets/00924c60-23c0-4e31-b16e-c2f86f3a1ded)
+![Slide5](https://github.com/user-attachments/assets/f0165e36-84c6-4455-8dbc-8c565375141b)
+![Slide6](https://github.com/user-attachments/assets/b113ecb5-768f-4911-9766-97c015133325)
+![Slide7](https://github.com/user-attachments/assets/3c3af397-890a-4aeb-8a41-67336c8d1e64)
+![Slide8](https://github.com/user-attachments/assets/1b870cc2-df72-45c8-a25c-6e81acc8418f)
+![Slide9](https://github.com/user-attachments/assets/1650b9fa-9cfd-4947-b18a-cfe1733eb414)
+![Slide10](https://github.com/user-attachments/assets/224ac21e-498b-4e9f-bdea-002aa974580b)
+![Slide11](https://github.com/user-attachments/assets/b728343c-977b-4d36-a05b-1c5364bf82be)
+![Slide12](https://github.com/user-attachments/assets/0e5d12d8-d561-4a92-8c53-1f58db0844d5)
+![Slide13](https://github.com/user-attachments/assets/4703b739-bf61-4d47-bfa2-6625c734a1ea)
+![Slide14](https://github.com/user-attachments/assets/1dbd1f8b-24ad-427a-8f48-ec7cf0f99dcc)
+![Slide15](https://github.com/user-attachments/assets/07622696-4708-477e-8742-329deb75135d)
+![Slide16](https://github.com/user-attachments/assets/349ac330-fe84-47f6-a4d6-d8f566758d47)
 
-## Multi-Robotic Arm Coordination for Object Manipulation
+![Slide18](https://github.com/user-attachments/assets/eab3ae9b-b43f-4ca6-b6f2-39526a58f539)
+![Slide19](https://github.com/user-attachments/assets/b560b67e-9fcf-4009-9312-579daf9aa22d)
+![Slide20](https://github.com/user-attachments/assets/f489bc93-5232-45a5-8ec3-6929b152c253)
+![Slide21](https://github.com/user-attachments/assets/4fd13bcf-22d2-4112-8ec5-1956ca219458)
 
-In scenarios involving complex object manipulation, tasks such as handling cumbersome objects often require multiple robotic arms working in synergy. This project implements a modular control law within a multi-manual framework, with a focus on tasks that involve picking up unknown objects. Drawing inspiration from force and impedance control principles, a novel adaptation policy is introduced to address the limitations of conventional methods, such as coupled impedance and hybrid position/force control. The system uses human-like motion planning, relying on data from a single RGB-D camera.
 
-### Key Features:
 
-- **Point Cloud Processing**: The generated point cloud is rigorously filtered and evaluated to handle incomplete surface coverage. Key geometric parameters, such as the dimensions of bounding boxes and relative contact points, are extracted for precise manipulation.
-  
-- **Experimental Setup**: The system utilizes two Franka Emika robots. The workflow is divided into three phases:
-  1. **Initial Phase**: The object is scanned to locate potential contact regions.
-  2. **Contact Phase**: An impedance control policy is applied for a compliant approach.
-  3. **Post-Contact Phase**: A hybrid control policy lifts and manipulates the object.
 
-![Insert experimental setup image here](path/to/image.png)
-
----
-
-## Modular Control Strategy
-
-The implemented control strategy allows switching between compliant behavior during contact and stable manipulation during lifting, without the need for force sensors.
-
-### Impedance Control
-
-To ensure compliant interaction during object approach, the system uses an impedance control law:
-
-$$
-F_{cmd} = K (x_d - x) + D (\dot{x}_d - \dot{x})
-$$
-
-Where:
-- \( F_{cmd} \) is the commanded force,
-- \( K \) is the stiffness matrix,
-- \( D \) is the damping matrix,
-- \( x_d \) and \( x \) are the desired and current positions, respectively.
-
-### Adaptive Stiffness
-
-To resolve conflicts between motion and contact force directions, the stiffness is adapted as:
-
-$$
-eeK_C = \text{diag}([k_{t,x},\, k_{t,y},\, \rho_{imp}\,k_{t,z},\, k_{r,x},\, k_{r,y},\, k_{r,z}])
-$$
-
-with
-
-$$
-\rho_{imp} =
-\begin{cases}
-1, & \text{if } \delta_{imp} \leq ee\tilde{x}_z \\
-0.5\Big(1 - \cos\Big(\frac{\pi\,ee\tilde{x}_z}{\delta_{imp}}\Big)\Big), & \text{if } 0 \leq ee\tilde{x}_z < \delta_{imp} \\
-0, & \text{otherwise}
-\end{cases}
-$$
-
-### Force Control
-
-For stable object manipulation, a force controller maintains the desired contact force:
-
-$$
-\tau_{f\_rc} = J_{ee}^T (q) 
-\begin{pmatrix}
-0 \\[8pt]
-0 \\[8pt]
-\rho_{frc}\,f_{eff\_rc}
-\end{pmatrix}
-$$
-
-Where the effective force is given by:
-
-$$
-f_{eff\_rc} = eefd + k_p\,ee\tilde{f}_{ext} + k_i\int ee\tilde{f}_{ext}\,dt + k_d\,\dot{ee\tilde{f}}_{ext},
-$$
-
-with
-
-$$
-ee\tilde{f}_{ext} = eefd + eef_{ext,z}.
-$$
-
-A safeguard variable \( \rho_{frc} \) is used to disable force control when positional errors are large.
-
----
-
-## Human-Like Motion Planning
-
-Human-like trajectories are generated using functional Principal Component Analysis (fPCA). The motion is approximated as:
-
-$$
-x(t) \approx \bar{x} + S_0(t) + \sum_{i=1}^{5} \alpha_i\,S_i(t)
-$$
-
-Where:
-- \( \bar{x} \) is the average pose,
-- \( S_0(t) \) is the average trajectory,
-- \( S_i(t) \) are the basis functions (fPCs),
-- \( \alpha_i \) are the weighting coefficients.
-
-The planned trajectory is computed by solving a constrained system that satisfies the boundary conditions on position, velocity, and acceleration.
-
----
-
-## Conclusion and Future Works
-
-This project demonstrates that multi-robot coordination, when combined with adaptive impedance and force control, enables robust manipulation of cumbersome objects. Future enhancements will focus on:
-- Improved integration of orientation dynamics,
-- Better force estimation techniques, and
-- Extended vision processing to handle dynamic environments.
-
----
-
-## References
-
-1. Uchiyama, M. & Dauchez, P. (1992). *Symmetric kinematic formulation and non-master/slave coordinated control of two-arm robots*. Advanced Robotics, 7(4), 361–383.
-2. Nakano, E. (1974). *Cooperational control of the anthropomorphous manipulator*. Proc. 4th Int. Symp. Industrial Robots.
-3. Caccavale, F. & Uchiyama, M. (2016). *Cooperative manipulation*. Springer Handbook of Robotics, 989–1006.
-4. Shahriari, E., Birjandi, S. A. B., & Haddadin, S. (2022). *Passivity-based adaptive force-impedance control for modular multi-manual object manipulation*. IEEE Robotics and Automation Letters, 7(2), 2194–2201.
-5. Dehio, N., et al. (2022). *Enabling impedance-based physical human–multi–robot collaboration*. International Journal of Robotics Research, 41(1), 68–84.
-6. Bouyarmane, K., et al. (2018). *Quadratic programming for multirobot and task-space force control*. IEEE Transactions on Robotics, 35(1), 64–77.
-7. Hogan, N. (1984). *Impedance control of industrial robots*. Robotics and Computer-Integrated Manufacturing, 1(1), 97–113.
-8. De Luca, A., et al. (2006). *Collision detection and safe reaction with the DLR-III lightweight manipulator arm*. IEEE/RSJ International Conference on Intelligent Robots and Systems.
-9. De Luca, A. & Mattone, R. (2005). *Sensorless robot collision detection and hybrid force/motion control*. IEEE International Conference on Robotics and Automation.
-10. Haddadin, S. (2005). *Evaluation criteria and control structures for safe human-robot interaction*. PhD Dissertation, TUM & DLR.
