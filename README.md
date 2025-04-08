@@ -1,53 +1,54 @@
-# Human-like motion planning and sensorless control framework for bimanual grasping of cumbersome objects
-![image](https://github.com/user-attachments/assets/7acff120-92bb-435b-aad3-098cbb71a09d)
+### Human-like motion planning and sensorless control framework for bimanual grasping of cumbersome objects
+
+## Multi-Robotic Arm Coordination for Object Manipulation
+
+In scenarios involving complex object manipulation, tasks such as handling cumbersome objects often require multiple robotic arms working in synergy. This project implements a modular control law within a multi-manual framework, with a focus on tasks that involve picking up unknown objects. Drawing inspiration from force and impedance control principles, a novel adaptation policy is introduced to address the limitations of conventional methods, such as coupled impedance and hybrid position/force control. The system uses human-like motion planning, relying on data from a single RGB-D camera.
+
+### Key Features:
+
+- **Point Cloud Processing**: The generated point cloud is rigorously filtered and evaluated to handle incomplete surface coverage. Key geometric parameters, such as the dimensions of bounding boxes and relative contact points, are extracted for precise manipulation.
+  
+- **Experimental Setup**: The system utilizes two Franka Emika robots. The workflow is divided into three phases:
+  1. **Initial Phase**: The system assesses the object to identify critical contact areas required for successful manipulation.
+  2. **Contact Phase**: An impedance control policy is applied to ensure stable and responsive contact during manipulation.
+  3. **Post-Contact Phase**: A hybrid control policy is used to lift and manipulate the object effectively.
+
+## Introduction
+
+Robots are increasingly being integrated into human environments, with industries expecting humanoid robots to replace human workers without the need for workspace redesign. In home and healthcare settings, robots must be adaptable to human-centric environments. As technology advances, humanoid robots will improve in their ability to mimic human movements and manipulation skills.
+
+Interest in dual-arm manipulation has grown, adding complexity and challenges not present in single-arm systems. Addressing these challenges requires sophisticated integration, planning, reasoning, and control strategies. This complexity drives the development of technologies for coordinating multiple robots' motions, controlling motion and force, and optimizing contact forces in real-time using techniques like quadratic programming.
+
+Cooperative multi-arm systems must control both the motion of an object and its internal stresses. A force controller can regulate force on the object's surface and estimate external wrenches by comparing applied torque with model-based instructions.
+
+Previous research focused on manipulation tasks assuming contact had already been made. 
+
+This study explores the impact of imperfect grasp due to vision and approach control inaccuracies on manipulation outcomes. The goal is to fill a research gap by proposing a method to identify objects and coordinate manipulator movements based on gathered information.
+
+An RGB-D camera captures the workspace's point cloud, enabling the vision node to filter and cluster data to identify potential contact points, even without prior knowledge of the object. Using this data, a Human-Like trajectory is planned for the manipulators to make contact with the object. In the final stage, hybrid control (combining force and Cartesian control) ensures a stable grip, facilitating the subsequent manipulation process.
 
 
-## Object Manipulation Control Law
+## Problem Formulation
 
-Object manipulation can be broken down into two primary components:
-1. **Object Movement**: Controlling the movement of the object within the desired workspace.
-2. **Gripping the Object**: Maintaining a firm grip on the object while it is in motion to prevent slippage or loss of control.
+I have been working with a framework consisting of two seven-jointed manipulators that are firmly grasping a common rigid object. In order to ensure a stable grasp, each manipulator must apply a normal force `${}^{ee}f_d` at their respective contact points. 
 
-## Hybrid Control
+This algorithm, designed for an `n`-DoF manipulator, assumes that `${}^{ee}R` rotates its frame with respect to the task frame. The other cooperative arms will use the same algorithm, each with their associated frame rotation matrix (see Fig. `franka_box_1`).
 
-Hybrid control integrates two distinct control strategies to achieve effective manipulation:
+Assuming a stable grasp between the end-effector and the object, we define the end-effector's vector `${}^{ee}p_{cr}` within its frame, linking it to the object's rotation center. This common point among all manipulators is critical, as it provides a uniform reference for all robots. This is necessary in our dual-arm framework to preserve modularity by controlling the object's center of rotation instead of individual manipulator control.
 
-- **Force Control**: This approach focuses on controlling the contact wrench (the combination of force and torque) applied to the object, ensuring a stable grip and preventing any unwanted slippage during manipulation.
+To relate velocities, I define the Jacobian matrix `J_{cr} ∈ ℝ^{6×6}`, where `x` and `x_{ee}` represent the Cartesian poses of the object's rotation center and the manipulator's end-effector, respectively.
 
-- **Impedance Control**: This method is used to regulate the motion of the object, by controlling its dynamics (position, velocity, and force) while interacting with the environment. It aims to provide a smooth response to external disturbances, ensuring controlled movement.
+As a result, the manipulator joint velocities can be mapped into Cartesian space at the object's center of rotation through the following equation:
 
-## Main Limitation of Force/Motion Hybrid Control
+\[
+\dot{x} = \underbrace{J_{cr}J_{ee}(q)}_{J(q)} \dot{q}
+\]
 
-One of the primary limitations of force/motion hybrid control is the potential **conflict between the direction of the desired force and the desired motion**.
+Finally, the dynamics of the manipulator in Cartesian space can be defined with respect to the object's center of rotation as:
 
-### Example Scenario
+\[
+M_C(q)\ddot{x} + C_C(q\dot{q})\dot{x} + f_g(q) = f_{in} + J_{cr}^{-T} f_{ext}
+\]
 
-Consider a situation where the desired motion of the object is in the **opposite direction** of the desired grasp force. In this case:
-
-- Following the desired motion might result in **losing contact** with the object.
-- This loss of contact could lead to **grasp failure**, as the object may slip or become unstable.
-
-This conflict between force and motion directions can present challenges in achieving stable and effective object manipulation.
-![image](https://github.com/user-attachments/assets/f33e2382-6580-4fe5-9cac-47dac9b9ab31)
-## Desired Trajectory in Task Frame
-
-The term $$^{𝑇𝐹}x_𝑑 $$ represents the desired trajectory of the object defined in a **task frame**.
-
-### Objective
-
-The objective is to establish a **shared point of reference** that allows multiple manipulators to work together without needing to coordinate the movements of each arm in relation to the others. Instead, the focus is on:
-
-- **Controlling the pose of the object** rather than the individual movements of each manipulator.
-- Ensuring that the object follows the desired trajectory **within the task frame** while maintaining coordination among the manipulators.
-
-![image](https://github.com/user-attachments/assets/b34a47f4-c5a3-4004-b701-30d0231b9daf)
-![image](https://github.com/user-attachments/assets/cec7eb4f-a1b2-4d3e-928e-071433e42143)
-
-In order to address the aforementioned possible conflict, we first define and adapt the stiffness matrix in the end-effector frame 
-Proposed stiffness adaptation policy 
-![image](https://github.com/user-attachments/assets/65ec854b-3457-4ec4-ab67-ad88b7360ff6)
-
-
-
-
+where `f_{ext} ∈ ℝ^{6}` is the external wrench acting on the robot.
 
