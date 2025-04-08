@@ -30,7 +30,7 @@ An RGB-D camera captures the workspace's point cloud, enabling the vision node t
 
 ## Problem Formulation
 
-I have been working with a framework consisting of two seven-jointed manipulators that are firmly grasping a common rigid object. In order to ensure a stable grasp, each manipulator must apply a normal force $ {}^{ee}f_d $ at their respective contact points. 
+I have been working with a framework consisting of two seven-jointed manipulators that are firmly grasping a common rigid object. In order to ensure a stable grasp, each manipulator must apply a normal force $${}^{ee}f_d$$ at their respective contact points. 
 
 This algorithm, designed for an $$n$$-DoF manipulator, assumes that $$ {}^{ee}R $$ rotates its frame with respect to the task frame. The other cooperative arms will use the same algorithm, each with their associated frame rotation matrix (see Fig. `franka_box_1`).
 
