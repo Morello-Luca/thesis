@@ -50,6 +50,6 @@ $$
 M_C(q) \ddot{x} + C_C(q \dot{q}) \dot{x} + f_g(q) = f_{in} + J_{cr}^{-T} f_{ext}
 $$
 
-where $$f_{ext \in \mathbb{R}^6$$ is the external wrench acting on the robot.
+where $$f_{ext} \in \mathbb{R}^6$$ is the external wrench acting on the robot.
 ![franka_box_1](https://github.com/user-attachments/assets/6dcae09b-d5ec-41df-a834-b84a92aff8b7)
 
