@@ -9,47 +9,116 @@ In scenarios involving complex object manipulation, tasks such as handling cumbe
 - **Point Cloud Processing**: The generated point cloud is rigorously filtered and evaluated to handle incomplete surface coverage. Key geometric parameters, such as the dimensions of bounding boxes and relative contact points, are extracted for precise manipulation.
   
 - **Experimental Setup**: The system utilizes two Franka Emika robots. The workflow is divided into three phases:
-  1. **Initial Phase**: The system assesses the object to identify critical contact areas required for successful manipulation.
-  2. **Contact Phase**: An impedance control policy is applied to ensure stable and responsive contact during manipulation.
-  3. **Post-Contact Phase**: A hybrid control policy is used to lift and manipulate the object effectively.
+  1. **Initial Phase**: The object is scanned to locate potential contact regions.
+  2. **Contact Phase**: An impedance control policy is applied for a compliant approach.
+  3. **Post-Contact Phase**: A hybrid control policy lifts and manipulates the object.
 
-## Introduction
+![Insert experimental setup image here](path/to/image.png)
 
-Robots are increasingly being integrated into human environments, with industries expecting humanoid robots to replace human workers without the need for workspace redesign. In home and healthcare settings, robots must be adaptable to human-centric environments. As technology advances, humanoid robots will improve in their ability to mimic human movements and manipulation skills.
+---
 
-Interest in dual-arm manipulation has grown, adding complexity and challenges not present in single-arm systems. Addressing these challenges requires sophisticated integration, planning, reasoning, and control strategies. This complexity drives the development of technologies for coordinating multiple robots' motions, controlling motion and force, and optimizing contact forces in real-time using techniques like quadratic programming.
+## Modular Control Strategy
 
-Cooperative multi-arm systems must control both the motion of an object and its internal stresses. A force controller can regulate force on the object's surface and estimate external wrenches by comparing applied torque with model-based instructions.
+The implemented control strategy allows switching between compliant behavior during contact and stable manipulation during lifting, without the need for force sensors.
 
-Previous research focused on manipulation tasks assuming contact had already been made. 
+### Impedance Control
 
-This study explores the impact of imperfect grasp due to vision and approach control inaccuracies on manipulation outcomes. The goal is to fill a research gap by proposing a method to identify objects and coordinate manipulator movements based on gathered information.
-
-An RGB-D camera captures the workspace's point cloud, enabling the vision node to filter and cluster data to identify potential contact points, even without prior knowledge of the object. Using this data, a Human-Like trajectory is planned for the manipulators to make contact with the object. In the final stage, hybrid control (combining force and Cartesian control) ensures a stable grip, facilitating the subsequent manipulation process.
-
-
-## Problem Formulation
-
-I have been working with a framework consisting of two seven-jointed manipulators that are firmly grasping a common rigid object. In order to ensure a stable grasp, each manipulator must apply a normal force $${}^{ee}f_d$$ at their respective contact points. 
-
-This algorithm, designed for an $$n$$-DoF manipulator, assumes that $${}^{ee}R$$ rotates its frame with respect to the task frame. The other cooperative arms will use the same algorithm, each with their associated frame rotation matrix (see Fig. `franka_box_1`).
-
-Assuming a stable grasp between the end-effector and the object, we define the end-effector's vector $${}^{ee}p_{cr}$$ within its frame, linking it to the object's rotation center. This common point among all manipulators is critical, as it provides a uniform reference for all robots. This is necessary in our dual-arm framework to preserve modularity by controlling the object's center of rotation instead of individual manipulator control.
-
-To relate velocities, I define the Jacobian matrix $$J_{cr} \in \mathbb{R}^{6 \times 6}$$, where $$x$$ and $$x_{ee}$$ represent the Cartesian poses of the object's rotation center and the manipulator's end-effector, respectively.
-
-As a result, the manipulator joint velocities can be mapped into Cartesian space at the object's center of rotation through the following equation:
+To ensure compliant interaction during object approach, the system uses an impedance control law:
 
 $$
-\dot{x} = \underbrace{J_{cr} J_{ee}(q)}_{J(q)} \dot{q}
+F_{cmd} = K (x_d - x) + D (\dot{x}_d - \dot{x})
 $$
 
-Finally, the dynamics of the manipulator in Cartesian space can be defined with respect to the object's center of rotation as:
+Where:
+- \( F_{cmd} \) is the commanded force,
+- \( K \) is the stiffness matrix,
+- \( D \) is the damping matrix,
+- \( x_d \) and \( x \) are the desired and current positions, respectively.
+
+### Adaptive Stiffness
+
+To resolve conflicts between motion and contact force directions, the stiffness is adapted as:
 
 $$
-M_C(q) \ddot{x} + C_C(q \dot{q}) \dot{x} + f_g(q) = f_{in} + J_{cr}^{-T} f_{ext}
+eeK_C = \text{diag}([k_{t,x},\, k_{t,y},\, \rho_{imp}\,k_{t,z},\, k_{r,x},\, k_{r,y},\, k_{r,z}])
 $$
 
-where $$f_{ext} \in \mathbb{R}^6$$ is the external wrench acting on the robot.
-![franka_box_1](https://github.com/user-attachments/assets/6dcae09b-d5ec-41df-a834-b84a92aff8b7)
+with
 
+$$
+\rho_{imp} =
+\begin{cases}
+1, & \text{if } \delta_{imp} \leq ee\tilde{x}_z \\
+0.5\Big(1 - \cos\Big(\frac{\pi\,ee\tilde{x}_z}{\delta_{imp}}\Big)\Big), & \text{if } 0 \leq ee\tilde{x}_z < \delta_{imp} \\
+0, & \text{otherwise}
+\end{cases}
+$$
+
+### Force Control
+
+For stable object manipulation, a force controller maintains the desired contact force:
+
+$$
+\tau_{f\_rc} = J_{ee}^T (q) 
+\begin{pmatrix}
+0 \\[8pt]
+0 \\[8pt]
+\rho_{frc}\,f_{eff\_rc}
+\end{pmatrix}
+$$
+
+Where the effective force is given by:
+
+$$
+f_{eff\_rc} = eefd + k_p\,ee\tilde{f}_{ext} + k_i\int ee\tilde{f}_{ext}\,dt + k_d\,\dot{ee\tilde{f}}_{ext},
+$$
+
+with
+
+$$
+ee\tilde{f}_{ext} = eefd + eef_{ext,z}.
+$$
+
+A safeguard variable \( \rho_{frc} \) is used to disable force control when positional errors are large.
+
+---
+
+## Human-Like Motion Planning
+
+Human-like trajectories are generated using functional Principal Component Analysis (fPCA). The motion is approximated as:
+
+$$
+x(t) \approx \bar{x} + S_0(t) + \sum_{i=1}^{5} \alpha_i\,S_i(t)
+$$
+
+Where:
+- \( \bar{x} \) is the average pose,
+- \( S_0(t) \) is the average trajectory,
+- \( S_i(t) \) are the basis functions (fPCs),
+- \( \alpha_i \) are the weighting coefficients.
+
+The planned trajectory is computed by solving a constrained system that satisfies the boundary conditions on position, velocity, and acceleration.
+
+---
+
+## Conclusion and Future Works
+
+This project demonstrates that multi-robot coordination, when combined with adaptive impedance and force control, enables robust manipulation of cumbersome objects. Future enhancements will focus on:
+- Improved integration of orientation dynamics,
+- Better force estimation techniques, and
+- Extended vision processing to handle dynamic environments.
+
+---
+
+## References
+
+1. Uchiyama, M. & Dauchez, P. (1992). *Symmetric kinematic formulation and non-master/slave coordinated control of two-arm robots*. Advanced Robotics, 7(4), 361–383.
+2. Nakano, E. (1974). *Cooperational control of the anthropomorphous manipulator*. Proc. 4th Int. Symp. Industrial Robots.
+3. Caccavale, F. & Uchiyama, M. (2016). *Cooperative manipulation*. Springer Handbook of Robotics, 989–1006.
+4. Shahriari, E., Birjandi, S. A. B., & Haddadin, S. (2022). *Passivity-based adaptive force-impedance control for modular multi-manual object manipulation*. IEEE Robotics and Automation Letters, 7(2), 2194–2201.
+5. Dehio, N., et al. (2022). *Enabling impedance-based physical human–multi–robot collaboration*. International Journal of Robotics Research, 41(1), 68–84.
+6. Bouyarmane, K., et al. (2018). *Quadratic programming for multirobot and task-space force control*. IEEE Transactions on Robotics, 35(1), 64–77.
+7. Hogan, N. (1984). *Impedance control of industrial robots*. Robotics and Computer-Integrated Manufacturing, 1(1), 97–113.
+8. De Luca, A., et al. (2006). *Collision detection and safe reaction with the DLR-III lightweight manipulator arm*. IEEE/RSJ International Conference on Intelligent Robots and Systems.
+9. De Luca, A. & Mattone, R. (2005). *Sensorless robot collision detection and hybrid force/motion control*. IEEE International Conference on Robotics and Automation.
+10. Haddadin, S. (2005). *Evaluation criteria and control structures for safe human-robot interaction*. PhD Dissertation, TUM & DLR.
